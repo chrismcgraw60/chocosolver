@@ -113,13 +113,19 @@ public class SymmetryAnalyzer implements Analyzer {
         Function<AstRef, AstClafer> getTargetType = AstRef::getTargetType;
         getSourceType.andThen(AstUtil::getConcreteSubs).andThen(map(getCard.andThen(Card::getHigh))).andThen(
                 SymmetryAnalyzer::maxOrZero);
+//        Collections.sort(refs, Collections.reverseOrder(new ChainedComparator<>(
+//                Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
+//                        .andThen(map(getCard.andThen(Card::getHigh))).andThen(SymmetryAnalyzer::maxOrZero)),
+//                Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
+//                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero)),
+//                Comparator.comparing(getSourceType.andThen(analysis::getScope)),
+//                Comparator.comparing(getTargetType.andThen(analysis::getScope))
+//        )));
         Collections.sort(refs, Collections.reverseOrder(new ChainedComparator<>(
                 Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
                         .andThen(map(getCard.andThen(Card::getHigh))).andThen(SymmetryAnalyzer::maxOrZero)),
                 Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
-                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero)),
-                Comparator.comparing(getSourceType.andThen(analysis::getScope)),
-                Comparator.comparing(getTargetType.andThen(analysis::getScope))
+                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero))
         )));
         Map<AstRef, int[]> breakableRefsMap = new HashMap<>();
         Map<AstClafer, AstRef[]> breakableTargetsMap = new HashMap<>();
