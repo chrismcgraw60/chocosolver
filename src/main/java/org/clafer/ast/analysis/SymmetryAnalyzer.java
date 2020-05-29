@@ -1,6 +1,5 @@
 package org.clafer.ast.analysis;
 
-import gnu.trove.list.array.TIntArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.clafer.ast.AstAbstractClafer;
 import org.clafer.ast.AstClafer;
 import org.clafer.ast.AstConcreteClafer;
@@ -22,6 +22,8 @@ import org.clafer.collection.Pair;
 import org.clafer.common.Util;
 import org.clafer.graph.GraphUtil;
 import org.clafer.graph.KeyGraph;
+
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * This analyzer determines where symmetry is and is not possible.
@@ -111,22 +113,30 @@ public class SymmetryAnalyzer implements Analyzer {
         Function<AstConcreteClafer, Card> getCard = analysis::getCard;
         Function<AstRef, AstClafer> getSourceType = AstRef::getSourceType;
         Function<AstRef, AstClafer> getTargetType = AstRef::getTargetType;
+        
+        Function<AstRef, Integer> srcTypeScope = (astRef) -> analysis.getScope(astRef.getSourceType());
+        Function<AstRef, Integer> tgtTypeScope = (astRef) -> analysis.getScope(astRef.getTargetType());
+        
         getSourceType.andThen(AstUtil::getConcreteSubs).andThen(map(getCard.andThen(Card::getHigh))).andThen(
                 SymmetryAnalyzer::maxOrZero);
-//        Collections.sort(refs, Collections.reverseOrder(new ChainedComparator<>(
-//                Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
-//                        .andThen(map(getCard.andThen(Card::getHigh))).andThen(SymmetryAnalyzer::maxOrZero)),
-//                Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
-//                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero)),
-//                Comparator.comparing(getSourceType.andThen(analysis::getScope)),
-//                Comparator.comparing(getTargetType.andThen(analysis::getScope))
-//        )));
+//      Collections.sort(refs, Collections.reverseOrder(new ChainedComparator<>(
+//      Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
+//              .andThen(map(getCard.andThen(Card::getHigh))).andThen(SymmetryAnalyzer::maxOrZero)),
+//      Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
+//              .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero)),
+//      Comparator.comparing(getSourceType.andThen(analysis::getScope)),
+//      Comparator.comparing(getTargetType.andThen(analysis::getScope))
+//)));
+        
         Collections.sort(refs, Collections.reverseOrder(new ChainedComparator<>(
                 Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
                         .andThen(map(getCard.andThen(Card::getHigh))).andThen(SymmetryAnalyzer::maxOrZero)),
                 Comparator.comparing(getSourceType.andThen(AstUtil::getConcreteSubs)
-                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero))
+                        .andThen(map(getCard.andThen(Card::getLow))).andThen(SymmetryAnalyzer::maxOrZero)),
+                Comparator.comparing(srcTypeScope),
+                Comparator.comparing(tgtTypeScope)
         )));
+        
         Map<AstRef, int[]> breakableRefsMap = new HashMap<>();
         Map<AstClafer, AstRef[]> breakableTargetsMap = new HashMap<>();
         for (AstRef ref : refs) {

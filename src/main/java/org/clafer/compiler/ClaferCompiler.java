@@ -234,6 +234,8 @@ public class ClaferCompiler {
             restartPolicy(solver, options);
             return new ClaferSolver(solver, solution, options.getStrategy() == ClaferSearchStrategy.Random);
         } catch (UnsatisfiableException e) {
+        	e.printStackTrace();        
+        	// ClaferCompiler.compileUnsat(in, scope, options); ??
             return new ClaferSolver();
         }
     }
