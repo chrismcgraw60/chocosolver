@@ -3,6 +3,8 @@ package org.clafer.compiler;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,6 +26,7 @@ import org.clafer.assertion.Assertion;
 import org.clafer.ast.AstAbstractClafer;
 import org.clafer.ast.AstClafer;
 import org.clafer.ast.AstConcreteClafer;
+import org.clafer.ast.AstConstraint;
 import org.clafer.ast.AstModel;
 import org.clafer.ast.AstRef;
 import org.clafer.ast.AstStringClafer;
@@ -32,12 +35,14 @@ import org.clafer.ast.analysis.UnsatAnalyzer;
 import org.clafer.ast.compiler.AstCompiler;
 import org.clafer.ast.compiler.AstSolutionMap;
 import org.clafer.collection.Either;
+import org.clafer.collection.Pair;
 import org.clafer.common.Check;
 import org.clafer.common.UnsatisfiableException;
 import org.clafer.common.Util;
 import org.clafer.graph.GraphUtil;
 import org.clafer.graph.KeyGraph;
 import org.clafer.graph.Vertex;
+import org.clafer.instance.InstanceModel;
 import org.clafer.ir.IrBoolVar;
 import org.clafer.ir.IrIntVar;
 import org.clafer.ir.IrModule;
@@ -234,9 +239,26 @@ public class ClaferCompiler {
             restartPolicy(solver, options);
             return new ClaferSolver(solver, solution, options.getStrategy() == ClaferSearchStrategy.Random);
         } catch (UnsatisfiableException e) {
-        	e.printStackTrace();        
-        	// ClaferCompiler.compileUnsat(in, scope, options); ??
+        	
+        	///
+        	e.printStackTrace();  
+        	
+        	System.out.println("UNSAT REPORT:");
+        	ClaferUnsat unsat = ClaferCompiler.compileUnsat(in, scope, options);
+        	
+        	System.out.println("CORE");
+        	unsat.unsatCore().forEach(astConstraint -> System.out.println(astConstraint));
+        	
+        	System.out.println("MIN UNSAT");
+        	Pair<Set<AstConstraint>, InstanceModel> minUnsat = unsat.minUnsat();
+        	try {
+				minUnsat.getSnd().print();
+			} catch (IOException e1) {
+			}
+        	minUnsat.getFst().forEach(astConstraint -> System.out.println(astConstraint));
+        	
             return new ClaferSolver();
+            ///
         }
     }
 
