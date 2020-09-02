@@ -1,8 +1,6 @@
 package org.clafer.compiler;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.limits.NodeCounter;
@@ -24,6 +23,7 @@ import org.clafer.assertion.Assertion;
 import org.clafer.ast.AstAbstractClafer;
 import org.clafer.ast.AstClafer;
 import org.clafer.ast.AstConcreteClafer;
+import org.clafer.ast.AstConstraint;
 import org.clafer.ast.AstModel;
 import org.clafer.ast.AstRef;
 import org.clafer.ast.AstStringClafer;
@@ -39,6 +39,7 @@ import org.clafer.common.Util;
 import org.clafer.graph.GraphUtil;
 import org.clafer.graph.KeyGraph;
 import org.clafer.graph.Vertex;
+import org.clafer.instance.InstanceModel;
 import org.clafer.ir.IrBoolVar;
 import org.clafer.ir.IrIntVar;
 import org.clafer.ir.IrModule;
@@ -51,6 +52,10 @@ import org.clafer.objective.Objective;
 import org.clafer.scope.Scopable;
 import org.clafer.scope.Scope;
 import org.clafer.scope.ScopeBuilder;
+
+import gnu.trove.impl.Constants;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Compiles from AST -> Choco
@@ -278,7 +283,39 @@ public class ClaferCompiler {
             restartPolicy(solver, options);
             return new ClaferSolver(solver, solution, options.getStrategy() == ClaferSearchStrategy.Random);
         } catch (UnsatisfiableException e) {
-            return new ClaferSolver();
+        	
+        	throw e;
+        	
+        	/// ------------------------------------------------
+//        	e.printStackTrace();  
+//        	
+//        	System.out.println("UNSAT REPORT:");
+//        	
+//        	// Core
+//        	ClaferUnsat unsatCore = ClaferCompiler.compileUnsat(in, scope, options);
+//        	
+//        	System.out.println("CORE");
+//        	unsatCore.unsatCore().forEach(astConstraint -> System.out.println(astConstraint));
+//        	
+//        	//Min
+//        	ClaferUnsat unsatMin = ClaferCompiler.compileUnsat(in, scope, options);
+//        	Pair<Set<AstConstraint>, InstanceModel> minUnsat = unsatMin.minUnsat();
+//        	
+//        	if (minUnsat != null) {
+//        		System.out.println("MIN UNSAT");
+//	        	try {
+//					minUnsat.getSnd().print();
+//				} catch (IOException e1) {
+//				}
+//	        	
+//	        	minUnsat.getFst().forEach(astConstraint -> System.out.println(astConstraint));
+//        	}
+//        	else {
+//        		System.out.println("No MIN UNSAT");
+//        	}
+//        	
+//            return new ClaferSolver();
+            /// -----------------------------------------------------
         }
     }
 
