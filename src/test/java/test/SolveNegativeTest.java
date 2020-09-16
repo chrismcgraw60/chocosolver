@@ -1,21 +1,20 @@
 package test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.script.ScriptException;
 
 import org.clafer.common.UnsatisfiableException;
 import org.clafer.compiler.ClaferCompiler;
-import org.clafer.compiler.ClaferSolver;
 import org.clafer.javascript.Javascript;
 import org.clafer.javascript.JavascriptFile;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

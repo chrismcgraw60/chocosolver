@@ -1,8 +1,5 @@
 package org.clafer;
 
-import org.clafer.ast.AstAbstractClafer;
-import org.clafer.ast.AstConcreteClafer;
-import org.clafer.ast.AstModel;
 import static org.clafer.ast.Asts.$this;
 import static org.clafer.ast.Asts.IntType;
 import static org.clafer.ast.Asts.Mandatory;
@@ -22,12 +19,17 @@ import static org.clafer.ast.Asts.newModel;
 import static org.clafer.ast.Asts.or;
 import static org.clafer.ast.Asts.some;
 import static org.clafer.ast.Asts.union;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.clafer.ast.AstAbstractClafer;
+import org.clafer.ast.AstConcreteClafer;
+import org.clafer.ast.AstModel;
+import org.clafer.common.UnsatisfiableException;
 import org.clafer.compiler.ClaferCompiler;
 import org.clafer.compiler.ClaferSolver;
 import org.clafer.scope.Scope;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -562,8 +564,16 @@ public class SimpleConstraintTest {
 
         model.addConstraint(equal(constant(4), constant(5)));
 
-        ClaferSolver solver = ClaferCompiler.compile(model, Scope.defaultScope(1));
-        assertFalse(solver.find());
+        try {
+        	ClaferCompiler.compile(model, Scope.defaultScope(1));
+        }
+        catch(UnsatisfiableException e) {
+        	//expected
+        	return;
+        }
+        
+        fail("Expected UnsatisfiableException");
+//        assertFalse(solver.find());
     }
 
     /**
